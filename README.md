@@ -15,12 +15,18 @@ You can:
 * Use `wget https://raw.githubusercontent.com/clbarnes/datashare_test/master/edgelist.csv` from your console
 * Click on `edgelist.csv` and then `Raw`, and copy and paste the text
 
+To update the data set from this source, just `git pull origin master`.
+
 ## Contributing
 
 If you would like to contribute to the data set:
+
 1. [Fork this repository](https://help.github.com/articles/fork-a-repo/) with your own github account
+ 
 2. Edit `data/edgelist.csv` with your changes
+ 
 3. [Push your changes](https://help.github.com/articles/pushing-to-a-remote/) to your forked repository
+
 4. [Raise a pull request](https://help.github.com/articles/using-pull-requests/) to integrate your changes into `master` for the maintainer to review.
 
 ## FAQ
