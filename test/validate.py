@@ -39,7 +39,7 @@ class FileIntegrityTests(EdgeListValidationTests):
     def get_dois(self):
         dois = defaultdict(list)
         for i, line in enumerate(self.body, 2):
-            doi1, doi2 = line.split(',')[self.header_id['source_doi']:self.header_id['target_doi']]
+            doi1, doi2 = line.split(',')[self.header_id['source_doi']:self.header_id['target_doi'] + 1]
             dois[doi1].append(i)
             dois[doi2].append(i)
         return dois
@@ -58,7 +58,7 @@ class FileIntegrityTests(EdgeListValidationTests):
             try:
                 urlopen(root_url.format(doi))
             except urllib.error.HTTPError:
-                raise AssertionError('DOI {} on line(s) {} does not exist'.format(doi, ', '.join(dois[doi])))
+                raise AssertionError('DOI {} on line(s) {} does not exist'.format(doi, ', '.join(str(val) for val in dois[doi])))
 
     def test_no_whitespace(self):
         for i, line in enumerate(self.body, 2):
