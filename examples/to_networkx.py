@@ -26,7 +26,7 @@ def edgelist_to_networkx(data_path=DATA_PATH):
                 (field.strip() for field in line.split(','))
 
             for node in (source, target):
-                if source not in graph.node:
+                if node not in graph.node:
                     graph.add_node(node, transmitters=dict(), receptors=dict())
 
             graph.node[source]['transmitters'][transmitter] = source_doi
@@ -36,3 +36,6 @@ def edgelist_to_networkx(data_path=DATA_PATH):
                            transmitter=transmitter, receptor=receptor)
 
     return graph
+
+if __name__ == '__main__':
+    graph = edgelist_to_networkx()
