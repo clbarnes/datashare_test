@@ -4,7 +4,7 @@
 
 A comma-separated value edge list file with the following columns:
 
-```source,target,transmitter,receptor,minimum_distance,source_doi,target_doi```
+`source,target,transmitter,receptor,minimum_distance,source_doi,target_doi`
 
 ## Usage
 
