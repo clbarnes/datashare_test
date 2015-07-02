@@ -1,0 +1,11 @@
+node1,node2,molecule,MolR,10
+node2,node5,molecule,MolR,10
+node6,node22,molecule,MolR,10
+node1,node50,molecule,MolR,10
+node22,node1,molecule,MolR,10
+node18,node31,molecule,MolR,10
+node35,node11,molecule,MolR,10
+node100,node52,molecule,MolR,10
+node123,node325,molecule,MolR,10
+node1,node2,molecule,MolR,10
+node1,node2,molecule,MolR,10
