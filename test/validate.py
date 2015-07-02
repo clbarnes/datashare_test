@@ -3,13 +3,14 @@ import os
 import re
 from urllib.request import urlopen
 import urllib.error
+from collections import defaultdict
 
 dois = set()
 
 DATA_PATH = 'data/edgelist.csv'
 
 
-class DataValidationTests(unittest.TestCase):
+class EdgeListValidationTests(unittest.TestCase):
     def setUp(self):
         with open(DATA_PATH, 'r') as f:
             all_lines = f.read().splitlines()
@@ -17,41 +18,61 @@ class DataValidationTests(unittest.TestCase):
             self.body = all_lines[1:]
             self.header_id = {name: idx for idx, name in enumerate(self.header.split(','))}
 
+class FileIntegrityTests(EdgeListValidationTests):
     def test_headers_match(self):
         assert self.header == 'source,target,transmitter,receptor,minimum_distance,source_doi,target_doi'
 
     def test_no_missing_fields(self):
         fields_re = re.compile(r'^.+,.+,.+,.+,.+,.+,.+$')
-        for line in self.body:
-            assert fields_re.match(line)
+        for i, line in enumerate(self.body, 2):
+            assert fields_re.match(line), 'Missing value in line {}:\n\t{}'.format(i, line)
 
     def test_distance_format(self):
         number_re = re.compile(r'^\d+\.\d+$')
-        for line in self.body:
-            dist = line.split(',')[self.header_id['minimum_distance']]
-            assert number_re.match(dist)
+        for i, line in enumerate(self.body, 2):
+            try:
+                float(line.split(',')[self.header_id['minimum_distance']])
+            except ValueError:
+                raise AssertionError(
+                    'Field minimum_distance in line {} does not look like a number\n\t'.format(i, line))
 
-    def get_doi_set(self):
-        doi_set = set()
-        for line in self.body:
-            doi_set.update(line.split(',')[self.header_id['source_doi']:self.header_id['target_doi']])
-        return doi_set
+    def get_dois(self):
+        dois = defaultdict(list)
+        for i, line in enumerate(self.body, 2):
+            doi1, doi2 = line.split(',')[self.header_id['source_doi']:self.header_id['target_doi']]
+            dois[doi1].append(i)
+            dois[doi2].append(i)
+        return dois
 
     def test_doi_format(self):
         doi_re = re.compile(r'doi:.+\..+/.+')
-        doi_set = self.get_doi_set()
-        for doi in doi_set:
-            assert doi_re.match(doi)
+        dois = self.get_dois()
+        for doi in dois:
+            assert doi_re.match(doi), \
+                "{} on line(s) {} is not a valid DOI. Does it start with 'doi:'?".format(doi, ', '.join(dois[doi]))
 
     def test_doi_exists(self):
-        doi_set = self.get_doi_set()
+        dois = self.get_dois()
         root_url = 'http://dx.doi.org/{}'
-        for doi in doi_set:
+        for doi in dois:
             try:
                 urlopen(root_url.format(doi))
             except urllib.error.HTTPError:
-                raise AssertionError('DOI {} does not exist'.format(doi))
+                raise AssertionError('DOI {} on line(s) {} does not exist'.format(doi, ', '.join(dois[doi])))
 
     def test_no_whitespace(self):
-        for line in self.body:
-            assert ' ' not in line
+        for i, line in enumerate(self.body, 2):
+            assert ' ' not in line, 'Rogue whitespace in line {}'.format(i)
+
+
+class DataIntegrityTests(EdgeListValidationTests):
+    def test_no_duplicate_edges(self):
+        edge_set = set()
+        headers = self.header.split(',')
+        for i, line in enumerate(self.body, 2):
+            d = dict(zip(headers, line.split(',')))
+            edge_str = '{source}_{target}_{transmitter}_{receptor}'.format(**d)
+            assert edge_str not in edge_set, \
+                'Edge {source} -> {target} ({transmitter} to {receptor}) is repeated on line {}'.format(i)
+
+            edge_set.add(edge_str)
