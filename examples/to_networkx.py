@@ -3,8 +3,9 @@ Using the edge list in Python (using the NetworkX package).
 """
 
 import networkx as nx
+import os
 
-DATA_PATH = '../data/edgelist.csv'
+DATA_PATH = os.path.relpath('../data/edgelist.csv', os.path.dirname(os.path.abspath(__file__)))
 
 
 def edgelist_to_networkx(data_path=DATA_PATH):
