@@ -1,3 +1,4 @@
+source,target,transmitter,receptor,minimum_distance
 node1,node2,molecule,MolR,10
 node2,node5,molecule,MolR,10
 node6,node22,molecule,MolR,10
