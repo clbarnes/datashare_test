@@ -20,9 +20,10 @@ def edgelist_to_networkx(data_path=DATA_PATH):
     """
     graph = nx.MultiDiGraph()
     with open(data_path) as f:
+        next(f)  # skip the header row
         for line in f:
-            fields = [field.strip() for field in line.split(',')]
-            source, target, transmitter, receptor, minimum_distance, source_doi, target_doi = fields
+            source, target, transmitter, receptor, minimum_distance, source_doi, target_doi = \
+                (field.strip() for field in line.split(','))
 
             for node in (source, target):
                 if source not in graph.node:
