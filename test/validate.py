@@ -1,5 +1,4 @@
 import unittest
-import os
 import re
 from urllib.request import urlopen
 import urllib.error
